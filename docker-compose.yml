@@ -1,0 +1,55 @@
+# Licensed Materials - Property of IBM
+# IBM Sterling Order Management (5725-D10), IBM Order Management (5737-D18)
+# (C) Copyright IBM Corp. 2018 All Rights Reserved.
+# US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+version: '3'
+services:
+  omruntime:
+    image: ${OM_IMAGE}:${OM_TAG}
+    command: ["sleep","infinity"]
+    volumes:
+      - ear:${RT}/external_deployments
+      - ./omruntime:/tmp/oms
+      - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
+      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
+      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+    depends_on:
+      - ${DB_SERVICE}server
+    container_name: om-runtime
+  appserver:
+    image: ${AP_IMAGE}:${AP_TAG}
+    ports:
+      - "${AP_HTTP_PORT}:9080"
+      - "${AP_HTTPS_PORT}:9443"
+    depends_on:
+      - omruntime
+    volumes:
+      - ear:/config/dropins
+      - ./appserver/jvm.options:/config/jvm.options
+      - ./appserver/server.xml:/config/server.xml
+      - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
+      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
+      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+    container_name: om-appserver
+  mqserver:
+    image: ${MQ_IMAGE}:${MQ_TAG}
+    ports:
+      - "${MQ_PORT}:1414"
+      - "${MQ_HTTP_PORT}:9443"
+    environment:
+      - LICENSE=${MQ_LICENSE}
+      - MQ_QMGR_NAME=${MQ_QMGR_NAME}
+    volumes:
+      - var_mqm:/mnt/mqm
+      - shared:/var/oms
+      - ./mqserver/config.mqsc:/etc/mqm/config.mqsc
+      - ./mqserver/configure_bindings.sh:/var/oms/configure_bindings.sh
+      - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
+    container_name: om-mqserver
+volumes:
+  shared:
+    driver: local
+  var_mqm:
+    driver: local
+  ear:
+    driver: local
