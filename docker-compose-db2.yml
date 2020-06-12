@@ -26,8 +26,7 @@ services:
     volumes:
       - db2insthome:/home/${DB_USER}/${DB_USER}
       - ./db2server/configure_db2.sh:/var/oms/configure_db2.sh
-      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
-      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+      - ./shared:/var/oms
     privileged: true
     container_name: om-db2server
 volumes:
