@@ -11,8 +11,8 @@ services:
       - ear:${RT}/external_deployments
       - ./omruntime:/tmp/oms
       - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
-      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
-      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+      - ./shared:/var/oms
+      - ./logs:/opt/ssfs/runtime/logs
     depends_on:
       - ${DB_SERVICE}server
     container_name: om-runtime
@@ -28,8 +28,8 @@ services:
       - ./appserver/jvm.options:/config/jvm.options
       - ./appserver/server.xml:/config/server.xml
       - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
-      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
-      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+      - ./shared:/var/oms
+      - ./logs:/opt/ssfs/runtime/logs
     container_name: om-appserver
   mqserver:
     image: ${MQ_IMAGE}:${MQ_TAG}
@@ -41,7 +41,8 @@ services:
       - MQ_QMGR_NAME=${MQ_QMGR_NAME}
     volumes:
       - var_mqm:/mnt/mqm
-      - shared:/var/oms
+      - ./shared:/var/oms
+      - ./logs:/opt/ssfs/runtime/logs
       - ./mqserver/config.mqsc:/etc/mqm/config.mqsc
       - ./mqserver/configure_bindings.sh:/var/oms/configure_bindings.sh
       - ${MQ_JNDI_DIR}:${MQ_JNDI_DIR}
