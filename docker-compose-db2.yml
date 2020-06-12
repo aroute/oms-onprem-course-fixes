@@ -1,0 +1,37 @@
+# Licensed Materials - Property of IBM
+# IBM Sterling Order Management (5725-D10), IBM Order Management (5737-D18)
+# (C) Copyright IBM Corp. 2018 All Rights Reserved.
+# US Government Users Restricted Rights - Use, duplication or disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+version: '3'
+services:
+  db2server:
+    image: ${DB_IMAGE}:${DB_TAG}
+    ports:
+      - "${DB_PORT}:${DB_PORT_IMAGE}"
+    entrypoint: /bin/bash
+    command: ["/var/oms/configure_db2.sh"]
+    environment:
+      - LICENSE=${DB_LICENSE}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_DATA=${DB_DATA}
+      - BLU=false
+      - ENABLE_ORACLE_COMPATIBILITY=true
+      - UPDATEAVAIL=NO
+      - TO_CREATE_SAMPLEDB=false
+      - REPODB=false
+      - IS_OSXFS=false
+      - PERSISTENT_HOME=true
+      - HADR_ENABLED=false
+    volumes:
+      - db2insthome:/home/${DB_USER}/${DB_USER}
+      - ./db2server/configure_db2.sh:/var/oms/configure_db2.sh
+      - ./shared:/home/demouser/devtoolkit/compose/docker/shared
+      - ./logs:/home/demouser/devtoolkit/compose/docker/logs
+    privileged: true
+    container_name: om-db2server
+volumes:
+  shared:
+    driver: local
+  db2insthome:
+    driver: local
